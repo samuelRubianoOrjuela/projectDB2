@@ -1,9 +1,3 @@
-	```sql
-    
-	```
-	---
-
-    
 DROP DATABASE IF EXISTS universidad;
 CREATE DATABASE universidad;
 USE universidad;
@@ -41,7 +35,7 @@ CREATE TABLE grado (
 );
 
 CREATE TABLE tipo_asignatura (
-    id_tipo_asignatura INT(5),
+    id_tipo_asignatura INT(5) AUTO_INCREMENT,
     nombre_tipo_asignatura VARCHAR(50),
     PRIMARY KEY (id_tipo_asignatura)
 );
@@ -53,10 +47,10 @@ CREATE TABLE profesor (
     apellido1 VARCHAR(50) NOT NULL,
     apellido2 VARCHAR(50),
     id_direccion VARCHAR(5) NOT NULL,
-    id_telefono VARCHAR(5),
+    id_telefono INT(5),
     fecha_nacimiento DATE NOT NULL,
     sexo ENUM('H', 'M') NOT NULL,
-    id_departamento INT UNSIGNED NOT NULL,
+    id_departamento INT UNSIGNED,
     FOREIGN KEY (id_departamento) REFERENCES departamento(id_departamento),
     FOREIGN KEY (id_telefono) REFERENCES telefono(id_telefono)
 );
@@ -87,7 +81,7 @@ CREATE TABLE alumno (
     apellido1 VARCHAR(50) NOT NULL,
     apellido2 VARCHAR(50),
     id_direccion VARCHAR(5) NOT NULL,
-    id_telefono VARCHAR(5),
+    id_telefono INT(5),
     fecha_nacimiento DATE NOT NULL,
     sexo ENUM('H', 'M') NOT NULL,
     FOREIGN KEY (id_telefono) REFERENCES telefono(id_telefono)
@@ -170,6 +164,8 @@ INSERT INTO departamento (nombre_departamento) VALUES
 ('Departamento de Matemáticas'),
 ('Departamento de Historia'),
 ('Departamento de Ciencias de la Computación'),
+('Departamento de Ciencias Naturales'),
+('Departamento de Idiomas'),
 ('Departamento de Literatura');
 
 INSERT INTO grado (nombre_grado) VALUES
@@ -189,28 +185,28 @@ INSERT INTO profesor (nif, nombre_profesor, apellido1, apellido2, id_direccion, 
 ('23456789B', 'María', 'López', 'Martínez', 2, 2, '1975-09-20', 'M', 2),
 ('34567890C', 'Pedro', 'Rodríguez', 'Gómez', 3, 3, '1985-03-15', 'H', 3),
 ('45678901D', 'Ana', 'Martín', 'Sánchez', 4, 4, '1978-11-25', 'M', 4),
-('56789012E', 'Carlos', 'Gómez', 'Fernández', 5, 5, '1982-07-05', 'H', 1),
+('56789012K', 'Carlos', 'Gómez', 'Fernández', 5, 5, '1982-07-05', 'H', NULL),
 ('67890123F', 'Laura', 'Pérez', 'López', 6, 6, '1987-01-30', 'M', 2),
 ('78901234G', 'David', 'Hernández', 'García', 7, 7, '1973-12-12', 'H', 3),
-('89012345H', 'Elena', 'Díaz', 'Martín', 8, 8, '1989-08-18', 'M', 4),
+('89012345K', 'Elena', 'Díaz', 'Martín', 8, 8, '1989-08-18', 'M', 4),
 ('90123456I', 'Sara', 'Ruiz', 'Hernández', 9, 9, '1984-04-08', 'M', 1),
-('01234567J', 'Javier', 'Fernández', 'Díaz', 10, 10, '1970-06-28', 'H', 2);
+('01234567J', 'Javier', 'Fernández', 'Díaz', 10, 10, '1970-06-28', 'H', NULL);
 
 INSERT INTO asignatura (nombre_asignatura, creditos, id_tipo_asignatura, curso, cuatrimestre, id_profesor, id_grado) VALUES
-('Matemáticas I', 6.0, 3, 1, 1, 1, 1),
+('Matemáticas I', 6.0, 3, 3, 1, NULL, 1),
 ('Programación', 6.0, 3, 1, 1, 3, 1),
 ('Historia Contemporánea', 6.0, 3, 1, 1, 2, 2),
-('Literatura Española', 6.0, 3, 1, 1, 4, 2),
+('Literatura Española', 6.0, 3, 1, 1, NULL, 2),
 ('Economía', 6.0, 3, 1, 1, 5, 3),
 ('Anatomía', 6.0, 3, 1, 1, 7, 3),
 ('Derecho Civil', 6.0, 3, 1, 1, 6, 4),
-('Psicología General', 6.0, 3, 1, 1, 8, 4),
+('Psicología General', 6.0, 3, 3, 1, 8, 4),
 ('Cálculo II', 6.0, 3, 2, 1, 9, 1),
 ('Estructura de Datos', 6.0, 3, 2, 1, 10, 1),
-('Historia del Arte', 6.0, 3, 2, 1, 1, 2),
+('Historia del Arte', 6.0, 3, 2, 1, NULL, 2),
 ('Literatura Universal', 6.0, 3, 2, 1, 3, 2),
-('Microeconomía', 6.0, 3, 2, 1, 5, 3),
-('Fisiología', 6.0, 3, 2, 1, 7, 3),
+('Microeconomía', 6.0, 3, 2, 1, NULL, 3),
+('Fisiología', 6.0, 3, 2, 1, NULL, 3),
 ('Derecho Penal', 6.0, 3, 2, 1, 6, 4),
 ('Psicología Infantil', 6.0, 3, 2, 1, 8, 4),
 ('Álgebra Lineal', 6.0, 3, 3, 2, 9, 1),
@@ -236,11 +232,11 @@ INSERT INTO curso_escolar (anyo_inicio, anyo_fin) VALUES
 ('2026', '2027');
 
 INSERT INTO alumno (nif, nombre_alumno, apellido1, apellido2, id_direccion, id_telefono, fecha_nacimiento, sexo) VALUES
-('12345678Z', 'Luis', 'García', 'Martínez', 11, 11, '2000-03-15', 'H'),
+('12345678Z', 'Alejandra', 'García', 'Martínez', 11, 11, '2000-03-15', 'M'),
 ('23456789Y', 'Ana', 'López', 'Fernández', 12, 12, '2001-06-20', 'M'),
 ('34567890X', 'Pablo', 'Martín', 'Gómez', 13, 13, '2000-12-05', 'H'),
 ('45678901W', 'Elena', 'Sánchez', 'Rodríguez', 14, 14, '2001-09-10', 'M'),
-('56789012V', 'Daniel', 'Gómez', 'Pérez', 15, 15, '2000-08-25', 'H'),
+('56789012V', 'Daniela', 'Gómez', 'Pérez', 15, 15, '2000-08-25', 'M'),
 ('67890123U', 'Laura', 'Hernández', 'García', 16, 16, '2001-04-30', 'M'),
 ('78901234T', 'Carlos', 'Díaz', 'Martínez', 17, 17, '2000-10-18', 'H'),
 ('89012345S', 'María', 'Muñoz', 'López', 18, 18, '2001-01-22', 'M'),
