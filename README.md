@@ -1,7 +1,9 @@
-# Proyecto Bases de Datos #1
+# Proyecto Bases de Datos #2
+
+![Texto alternativo](./structure.png)
 ### Consultas sobre una tabla
 ---
-
+ 
 1. Devuelve un listado con el primer apellido, segundo apellido y el nombre de todos los alumnos. El listado deberá estar ordenado alfabéticamente de menor a mayor por el primer apellido, segundo apellido y nombre.
 	```sql
     SELECT apellido1, apellido2, nombre_alumno
@@ -600,6 +602,7 @@
 	---
 
 ### Vistas
+Debe generar 10 vistas por cada Base de datos (Las vistas pueden ser tomadas de los comandos sql ya desarrollados)
 
 1. Cree una vista que devuelva un listado con los profesores que no imparten ninguna asignatura.
 	```sql
@@ -852,7 +855,7 @@
 	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
 	| id_alumno | nif       | nombre_alumno | apellido1 | apellido2 | id_direccion | id_telefono | fecha_nacimiento | sexo |
 	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
-	|        19 | 17844567Z | Pedro         | García    | Rubio     | 10           |           9 | 2000-07-15       | H    |
+	|        16 | 17844567Z | Pedro         | García    | Rubio     | 10           |           9 | 2000-07-15       | H    |
 	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
 	```
 	---
@@ -883,50 +886,238 @@
     END $$
     DELIMITER ; $$
 
-    CALL ActualizarAlumno (19, '17844567Z', 'Pablo', 'Lopez', 'Rubio', 11, 9, '2000-02-15', 'H');
+    CALL ActualizarAlumno (16, '17844567Z', 'Pablo', 'Lopez', 'Rubio', 11, 9, '2000-02-15', 'H');
+
 	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
 	| id_alumno | nif       | nombre_alumno | apellido1 | apellido2 | id_direccion | id_telefono | fecha_nacimiento | sexo |
 	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
-	|        19 | 17844567Z | Pablo         | Lopez     | Rubio     | 11           |           9 | 2000-02-15       | H    |
+	|        16 | 17844567Z | Pablo         | Lopez     | Rubio     | 11           |           9 | 2000-02-15       | H    |
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
+
+	```
+	---
+3. Procedimiento para eliminar un alumno por su ID
+	```sql
+    DELIMITER $$
+    DROP PROCEDURE IF EXISTS EliminarAlumno;
+    CREATE PROCEDURE EliminarAlumno (
+        IN p_id_alumno INT
+    )
+    BEGIN
+        DECLARE alumno_eliminado INT;
+        
+        DELETE FROM alumno
+        WHERE id_alumno = p_id_alumno;
+
+        SELECT COUNT(id_alumno)
+        INTO alumno_eliminado
+        FROM alumno
+        WHERE id_alumno = p_id_alumno;
+
+        IF alumno_eliminado = 0 THEN
+            SELECT CONCAT('Se eliminó el alumno de id: ', p_id_alumno) AS Mensaje;
+        ELSE
+            SELECT 'No se pudo eliminar el alumno' AS Mensaje;
+        END IF;
+    END $$
+    DELIMITER ; $$
+
+    CALL EliminarAlumno (16);
+
+    +---------------------------------+
+	| Mensaje                         |
+	+---------------------------------+
+	| Se eliminó el alumno de id: 16  |
+	+---------------------------------+
+	```
+	---
+4. Procedimiento para buscar un alumno por su ID
+	```sql
+    DELIMITER $$
+    DROP PROCEDURE IF EXISTS BuscarAlumnoPorID;
+    CREATE PROCEDURE BuscarAlumnoPorID (
+        IN p_id_alumno INT
+    )
+    BEGIN
+        SELECT *
+        FROM alumno
+        WHERE id_alumno = p_id_alumno;
+    END $$
+    DELIMITER ; $$
+
+    CALL BuscarAlumnoPorID (15);
+
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
+	| id_alumno | nif       | nombre_alumno | apellido1 | apellido2 | id_direccion | id_telefono | fecha_nacimiento | sexo |
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
+	|        15 | 56789012L | Andres        | Paniagua  | Pérez     | 25           |          25 | 2000-09-09       | H    |
 	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
 	```
 	---
-
+5. Procedimiento para buscar un alumno por su NIF
 	```sql
-    
+    DELIMITER $$
+    DROP PROCEDURE IF EXISTS BuscarAlumnoPorNIF;
+    CREATE PROCEDURE BuscarAlumnoPorNIF (
+        IN p_nif VARCHAR(9)
+    )
+    BEGIN
+        SELECT *
+        FROM alumno
+        WHERE nif = p_nif;
+    END $$
+    DELIMITER ; $$
+
+    CALL BuscarAlumnoPorNIF ('56789012L');
+
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
+	| id_alumno | nif       | nombre_alumno | apellido1 | apellido2 | id_direccion | id_telefono | fecha_nacimiento | sexo |
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
+	|        15 | 56789012L | Andres        | Paniagua  | Pérez     | 25           |          25 | 2000-09-09       | H    |
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
 	```
 	---
-
+6. Procedimiento para buscar un alumno por su nombre y apellidos
 	```sql
-    
+    DELIMITER $$
+    DROP PROCEDURE IF EXISTS BuscarAlumnoPorNombreApellidos;
+    CREATE PROCEDURE BuscarAlumnoPorNombreApellidos (
+        IN p_nombre VARCHAR(25),
+        IN p_apellido1 VARCHAR(50),
+        IN p_apellido2 VARCHAR(50)
+    )
+    BEGIN
+        SELECT *
+        FROM alumno
+        WHERE nombre_alumno = p_nombre
+        AND apellido1 = p_apellido1
+        AND apellido2 = p_apellido2;
+    END $$
+    DELIMITER ; $$
+
+    CALL BuscarAlumnoPorNombreApellidos ('Andres', 'Paniagua', 'Pérez');
+
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
+	| id_alumno | nif       | nombre_alumno | apellido1 | apellido2 | id_direccion | id_telefono | fecha_nacimiento | sexo |
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
+	|        15 | 56789012L | Andres        | Paniagua  | Pérez     | 25           |          25 | 2000-09-09       | H    |
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
+
 	```
 	---
-
+7. Procedimiento para listar todos los alumnos
 	```sql
-    
+    DELIMITER $$
+    DROP PROCEDURE IF EXISTS ListarAlumnos;
+    CREATE PROCEDURE ListarAlumnos ()
+    BEGIN
+        SELECT id_alumno, nombre_alumno, CONCAT(apellido1, ' ', apellido2) AS apellidos
+        FROM alumno;
+    END $$
+    DELIMITER ; $$
+
+    CALL ListarAlumnos ();
+
+	+-----------+---------------+---------------------+
+	| id_alumno | nombre_alumno | apellidos           |
+	+-----------+---------------+---------------------+
+	|         1 | Alejandra     | García Martínez     |
+	|         2 | Ana           | López Fernández     |
+	|         3 | Pablo         | Martín Gómez        |
+	|         4 | Elena         | Sánchez Rodríguez   |
+	|         5 | Daniela       | Gómez Pérez         |
+	|         6 | Laura         | Hernández García    |
+	|         7 | Carlos        | Díaz Martínez       |
+	|         8 | María         | Muñoz López         |
+	|         9 | Sara          | Torres Sánchez      |
+	|        10 | Alejandro     | Ruiz Fernández      |
+	|        11 | Lucía         | García Martínez     |
+	|        12 | Javier        | López Fernández     |
+	|        13 | Paula         | Martín Gómez        |
+	|        14 | Andrea        | Sánchez Rodríguez   |
+	|        15 | Andres        | Paniagua Pérez      |
+	+-----------+---------------+---------------------+
 	```
 	---
-
+8. Procedimiento para listar los alumnos de un determinado sexo
 	```sql
-    
+    DELIMITER $$
+    DROP PROCEDURE IF EXISTS ListarAlumnosPorSexo;
+    CREATE PROCEDURE ListarAlumnosPorSexo (
+        IN p_sexo ENUM('H', 'M')
+    )
+    BEGIN
+        SELECT id_alumno, nombre_alumno, CONCAT(apellido1, ' ', apellido2) AS apellidos
+        FROM alumno
+        WHERE sexo = p_sexo;
+    END $$
+    DELIMITER ; $$
+
+    CALL ListarAlumnosPorSexo ('M');
+
+	+-----------+---------------+---------------------+
+	| id_alumno | nombre_alumno | apellidos           |
+	+-----------+---------------+---------------------+
+	|         1 | Alejandra     | García Martínez     |
+	|         2 | Ana           | López Fernández     |
+	|         4 | Elena         | Sánchez Rodríguez   |
+	|         5 | Daniela       | Gómez Pérez         |
+	|         6 | Laura         | Hernández García    |
+	|         8 | María         | Muñoz López         |
+	|         9 | Sara          | Torres Sánchez      |
+	|        11 | Lucía         | García Martínez     |
+	|        13 | Paula         | Martín Gómez        |
+	|        14 | Andrea        | Sánchez Rodríguez   |
+	+-----------+---------------+---------------------+
+
 	```
 	---
-
+9. Procedimiento para listar los alumnos menores de una cierta edad
 	```sql
-    
+    DELIMITER $$
+    DROP PROCEDURE IF EXISTS ListarAlumnosMenoresEdad;
+    CREATE PROCEDURE ListarAlumnosMenoresEdad (
+        IN p_edad INT
+    )
+    BEGIN
+        SELECT id_alumno, nombre_alumno, CONCAT(apellido1, ' ', apellido2) AS apellidos
+        FROM alumno
+        WHERE YEAR(CURRENT_DATE) - YEAR(fecha_nacimiento) < p_edad;
+    END $$
+    DELIMITER ; $$
+
+    CALL ListarAlumnosMenoresEdad (24);
+
+	+-----------+---------------+---------------------+
+	| id_alumno | nombre_alumno | apellidos           |
+	+-----------+---------------+---------------------+
+	|         2 | Ana           | López Fernández     |
+	|         4 | Elena         | Sánchez Rodríguez   |
+	|         6 | Laura         | Hernández García    |
+	|         8 | María         | Muñoz López         |
+	|        10 | Alejandro     | Ruiz Fernández      |
+	|        12 | Javier        | López Fernández     |
+	|        14 | Andrea        | Sánchez Rodríguez   |
+	+-----------+---------------+---------------------+
 	```
 	---
-
+10. Procedimiento para contar el número total de alumnos
 	```sql
-    
-	```
+    DELIMITER $$
+    DROP PROCEDURE IF EXISTS ContarAlumnos;
+    CREATE PROCEDURE ContarAlumnos ()
+    BEGIN
+        SELECT COUNT(*) AS total_alumnos
+        FROM alumno;
+    END $$
+    DELIMITER ; $$
 
-	```sql
-    
-	```
-	---
+    CALL ContarAlumnos ();
 
-	```sql
-    
+	+---------------+
+	| total_alumnos |
+	+---------------+
+	|            15 |
+	+---------------+
 	```
 	---

@@ -1,3 +1,5 @@
+-- COMANDOS CREACIÓN DE TABLAS 
+
 DROP DATABASE IF EXISTS universidad;
 CREATE DATABASE universidad;
 USE universidad;
@@ -46,12 +48,13 @@ CREATE TABLE profesor (
     nombre_profesor VARCHAR(25) NOT NULL,
     apellido1 VARCHAR(50) NOT NULL,
     apellido2 VARCHAR(50),
-    id_direccion VARCHAR(5) NOT NULL,
+    id_direccion INT(5),
     id_telefono INT(5),
     fecha_nacimiento DATE NOT NULL,
     sexo ENUM('H', 'M') NOT NULL,
     id_departamento INT UNSIGNED,
     FOREIGN KEY (id_departamento) REFERENCES departamento(id_departamento),
+    FOREIGN KEY (id_direccion) REFERENCES direccion(id_direccion),
     FOREIGN KEY (id_telefono) REFERENCES telefono(id_telefono)
 );
  
@@ -65,6 +68,7 @@ CREATE TABLE asignatura (
     id_profesor INT UNSIGNED,
     id_grado INT UNSIGNED NOT NULL,
     FOREIGN KEY(id_profesor) REFERENCES profesor(id_profesor),
+    FOREIGN KEY(id_tipo_asignatura) REFERENCES tipo_asignatura(id_tipo_asignatura),
     FOREIGN KEY(id_grado) REFERENCES grado(id_grado)
 );
 
@@ -80,11 +84,12 @@ CREATE TABLE alumno (
     nombre_alumno VARCHAR(25) NOT NULL,
     apellido1 VARCHAR(50) NOT NULL,
     apellido2 VARCHAR(50),
-    id_direccion VARCHAR(5) NOT NULL,
+    id_direccion INT(5),
     id_telefono INT(5),
     fecha_nacimiento DATE NOT NULL,
     sexo ENUM('H', 'M') NOT NULL,
-    FOREIGN KEY (id_telefono) REFERENCES telefono(id_telefono)
+    FOREIGN KEY (id_telefono) REFERENCES telefono(id_telefono),
+    FOREIGN KEY (id_direccion) REFERENCES direccion(id_direccion)
 );
 
 CREATE TABLE alumno_se_matricula_asignatura (
@@ -97,7 +102,7 @@ CREATE TABLE alumno_se_matricula_asignatura (
     FOREIGN KEY (id_curso_escolar) REFERENCES curso_escolar(id_curso_escolar)
 );
 
-
+-- INSERCIÓN DE DATOS
 
 INSERT INTO ciudad (id_ciudad, nombre_ciudad) VALUES
 (1, 'Ciudad A'),
