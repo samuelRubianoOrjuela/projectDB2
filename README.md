@@ -204,7 +204,7 @@
 	+--------------------------------------------+
 	```
 	---
-6. Devuelve un listado con todos los alumnos que se han matriculado en alguna asignatura durante el curso escolar 2018/2019. 
+6. Devuelve un listado con todos los alumnos que se han matriculado en alguna asignatura durante el curso escolar 2023/2024. 
 	```sql
     SELECT DISTINCT a.id_alumno, a.nombre_alumno, CONCAT(a.apellido1, ' ', a.apellido2) AS apellidos
     FROM alumno a
@@ -596,5 +596,338 @@
 	|               5 | Departamento de Idiomas    |
 	|               6 | Departamento de Literatura |
 	+-----------------+----------------------------+
+	```
+	---
+
+### Vistas
+
+1. Cree una vista que devuelva un listado con los profesores que no imparten ninguna asignatura.
+	```sql
+    CREATE VIEW profesores_no_asignatura AS
+    SELECT p.id_profesor, p.apellido1, p.apellido2, p.nombre_profesor, a.id_asignatura
+    FROM profesor p
+    LEFT JOIN asignatura a ON p.id_profesor = a.id_profesor
+    WHERE a.id_asignatura IS NULL;
+
+    SELECT * FROM profesores_no_asignatura ;
+
+    +-------------+-----------+-----------+-----------------+---------------+
+	| id_profesor | apellido1 | apellido2 | nombre_profesor | id_asignatura |
+	+-------------+-----------+-----------+-----------------+---------------+
+	|           4 | Martín    | Sánchez   | Ana             |          NULL |
+	+-------------+-----------+-----------+-----------------+---------------+
+	```
+	---
+
+2. Cree una vista que devuelva un listado con los datos de todas las alumnas que se han matriculado alguna vez en el Grado en Ingeniería Informática.
+	```sql
+    CREATE VIEW alumnas_informaticas AS
+    SELECT DISTINCT a.id_alumno, a.nombre_alumno, CONCAT(a.apellido1, ' ', a.apellido2) AS apellidos
+    FROM alumno a
+    JOIN alumno_se_matricula_asignatura aa ON a.id_alumno = aa.id_alumno
+    JOIN asignatura ag ON aa.id_asignatura = ag.id_asignatura
+    JOIN grado g ON ag.id_grado = g.id_grado
+    WHERE a.sexo = 'M'
+    AND g.nombre_grado = 'Ingeniería Informática';
+
+    SELECT * FROM alumnas_informaticas ;
+
+	+-----------+---------------+-----------------+
+	| id_alumno | nombre_alumno | apellidos       |
+	+-----------+---------------+-----------------+
+	|         1 | Alejandra     | García Martínez |
+	|         5 | Daniela       | Gómez Pérez     |
+	+-----------+---------------+-----------------+
+	```
+	---
+
+3. Cree una vista que devuelva el listado de los alumnos que nacieron en 2000.
+	```sql
+    CREATE VIEW alumnos_2000 AS
+    SELECT apellido1, apellido2, nombre_alumno
+    FROM alumno
+    WHERE YEAR(fecha_nacimiento) = 2000;
+
+    SELECT * FROM alumnos_2000 ;
+
+    +-----------+-----------+---------------+
+	| apellido1 | apellido2 | nombre_alumno |
+	+-----------+-----------+---------------+
+	| García    | Martínez  | Luis          |
+	| Martín    | Gómez     | Pablo         |
+	| Gómez     | Pérez     | Daniel        |
+	| Díaz      | Martínez  | Carlos        |
+	| Torres    | Sánchez   | Sara          |
+	| García    | Martínez  | Lucía         |
+	| Martín    | Gómez     | Paula         |
+	| Paniagua  | Pérez     | Andres        |
+	+-----------+-----------+---------------+
+	```
+	---
+
+4. Cree una vista que averigüe el nombre y los dos apellidos de los alumnos que no han dado de alta su número de teléfono en la base de datos.
+	```sql
+    CREATE VIEW alumnos_telefono AS
+    SELECT apellido1, apellido2, nombre_alumno
+    FROM alumno
+    WHERE id_telefono IS NOT NULL;
+
+    SELECT * FROM alumnos_telefono ;
+
+	+-----------+-----------+---------------+
+	| apellido1 | apellido2 | nombre_alumno |
+	+-----------+-----------+---------------+
+	| García    | Martínez  | Luis          |
+	| López     | Fernández | Ana           |
+	| Martín    | Gómez     | Pablo         |
+	| Sánchez   | Rodríguez | Elena         |
+	| Gómez     | Pérez     | Daniel        |
+	| Hernández | García    | Laura         |
+	| Díaz      | Martínez  | Carlos        |
+	| Muñoz     | López     | María         |
+	| Torres    | Sánchez   | Sara          |
+	| Ruiz      | Fernández | Alejandro     |
+	| García    | Martínez  | Lucía         |
+	| López     | Fernández | Javier        |
+	| Martín    | Gómez     | Paula         |
+	| Sánchez   | Rodríguez | Andrea        |
+	| Paniagua  | Pérez     | Andres        |
+	+-----------+-----------+---------------+
+	```
+	---
+
+5. Cree una vista que devuelva un listado con todos los alumnos que se han matriculado en alguna asignatura durante el curso escolar 2018/2019. 
+	```sql
+	CREATE VIEW alumnos_2023 AS
+    SELECT DISTINCT a.id_alumno, a.nombre_alumno, CONCAT(a.apellido1, ' ', a.apellido2) AS apellidos
+    FROM alumno a
+    JOIN alumno_se_matricula_asignatura aa ON a.id_alumno = aa.id_alumno
+    JOIN curso_escolar c ON aa.id_curso_escolar = c.id_curso_escolar
+    WHERE c.anyo_inicio = '2023' AND c.anyo_fin = '2024';
+
+    SELECT * FROM alumnos_2023 ;
+
+    +-----------+---------------+-------------------+
+	| id_alumno | nombre_alumno | apellidos         |
+	+-----------+---------------+-------------------+
+	|         1 | Alejandra     | García Martínez   |
+	|         2 | Ana           | López Fernández   |
+	|         3 | Pablo         | Martín Gómez      |
+	|         4 | Elena         | Sánchez Rodríguez |
+	|         5 | Daniela       | Gómez Pérez       |
+	|         6 | Laura         | Hernández García  |
+	|         7 | Carlos        | Díaz Martínez     |
+	|         8 | María         | Muñoz López       |
+	+-----------+---------------+-------------------+
+	```
+	---
+
+6. Cree una vista que devuelva un listado con las asignaturas que no tienen un profesor asignado.
+	```sql
+    CREATE VIEW asignaturas_no_profesor AS
+    SELECT a.id_asignatura, a.nombre_asignatura, p.id_profesor
+    FROM profesor p
+    RIGHT JOIN asignatura a ON p.id_profesor = a.id_profesor
+    WHERE p.id_profesor IS NULL;
+
+    SELECT * FROM asignaturas_no_profesor ;
+
+	+---------------+---------------------+-------------+
+	| id_asignatura | nombre_asignatura   | id_profesor |
+	+---------------+---------------------+-------------+
+	|             1 | Matemáticas I       |        NULL |
+	|             4 | Literatura Española |        NULL |
+	|            11 | Historia del Arte   |        NULL |
+	|            13 | Microeconomía       |        NULL |
+	|            14 | Fisiología          |        NULL |
+	+---------------+---------------------+-------------+
+	```
+	---
+
+7. Cree una vista que devuelva el listado de profesores que no han dado de alta su número de teléfono en la base de datos y además su nif termina en K.
+	```sql
+    CREATE VIEW termina_K AS
+    SELECT apellido1, apellido2, nombre_profesor
+    FROM profesor
+    WHERE id_telefono IS NOT NULL 
+    AND nif LIKE '%K';
+
+    SELECT * FROM termina_K ;
+
+	+-----------+-----------+-----------------+
+	| apellido1 | apellido2 | nombre_profesor |
+	+-----------+-----------+-----------------+
+	| Gómez     | Fernández | Carlos          |
+	| Díaz      | Martín    | Elena           |
+	+-----------+-----------+-----------------+
+	```
+	---
+
+8. Cree una vista que devuelva el listado de las asignaturas que se imparten en el primer cuatrimestre, en el tercer curso del grado que tiene el identificador 7.
+	```sql
+    CREATE VIEW asignaturas_cuatrimestre_1 AS
+    SELECT id_asignatura, nombre_asignatura
+    FROM asignatura
+    WHERE cuatrimestre = 1 
+    AND curso = 3;
+
+    SELECT * FROM asignaturas_cuatrimestre_1 ;
+
+	+---------------+--------------------+
+	| id_asignatura | nombre_asignatura  |
+	+---------------+--------------------+
+	|             1 | Matemáticas I      |
+	|             8 | Psicología General |
+	+---------------+--------------------+
+	```
+	---
+
+9. Cree una vista que devuelva un listado con el nombre de las asignaturas, año de inicio y año de fin del curso escolar del alumno con nif 23456789Y.
+	```sql
+    CREATE VIEW asignaturas_nif AS
+    SELECT ag.nombre_asignatura, c.anyo_inicio, c.anyo_fin
+    FROM alumno_se_matricula_asignatura aa
+    JOIN asignatura ag ON aa.id_asignatura = ag.id_asignatura
+    JOIN alumno al ON aa.id_alumno = al.id_alumno
+    JOIN curso_escolar c ON aa.id_curso_escolar = c.id_curso_escolar
+    WHERE al.nif = '23456789Y';
+
+    SELECT * FROM asignaturas_nif ;
+
+    +------------------------+-------------+----------+
+	| nombre_asignatura      | anyo_inicio | anyo_fin |
+	+------------------------+-------------+----------+
+	| Historia Contemporánea |        2023 |     2024 |
+	| Literatura Española    |        2023 |     2024 |
+	+------------------------+-------------+----------+
+	```
+	---
+
+10. Cree una vista que devuelva un listado con el nombre de todos los departamentos que tienen profesores que imparten alguna asignatura en el Grado en Programación.
+	```sql
+    CREATE VIEW departamentos_profesores_asignatura AS
+    SELECT d.nombre_departamento
+    FROM profesor p
+    JOIN departamento d ON p.id_departamento = d.id_departamento
+    JOIN asignatura ag ON p.id_profesor = ag.id_profesor
+    WHERE ag.nombre_asignatura = 'Programación';
+
+    SELECT * FROM departamentos_profesores_asignatura ;
+
+	+--------------------------------------------+
+	| nombre_departamento                        |
+	+--------------------------------------------+
+	| Departamento de Ciencias de la Computación |
+	+--------------------------------------------+
+	```
+	---
+
+### Procedimientos almacenados
+1. Procedimiento para insertar un nuevo alumno
+	```sql
+    DELIMITER $$
+    DROP PROCEDURE IF EXISTS InsertarAlumno;
+    CREATE PROCEDURE InsertarAlumno (
+        IN p_nif VARCHAR(9),
+        IN p_nombre_alumno VARCHAR(25),
+        IN p_apellido1 VARCHAR(50),
+        IN p_apellido2 VARCHAR(50),
+        IN p_id_direccion VARCHAR(5),
+        IN p_id_telefono INT,
+        IN p_fecha_nacimiento DATE,
+        IN p_sexo ENUM('H','M')
+    )
+    BEGIN
+        INSERT INTO alumno (nif, nombre_alumno, apellido1, apellido2, id_direccion, id_telefono, fecha_nacimiento, sexo)
+        VALUES (p_nif, p_nombre_alumno, p_apellido1, p_apellido2, p_id_direccion, p_id_telefono, p_fecha_nacimiento, p_sexo);
+    
+        SELECT * 
+        FROM alumno
+        WHERE nif = p_nif;
+    END $$
+    DELIMITER ; $$
+
+    CALL InsertarAlumno ('17844567Z', 'Pedro', 'García', 'Rubio', 10, 9, '2000-07-15', 'H');
+
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
+	| id_alumno | nif       | nombre_alumno | apellido1 | apellido2 | id_direccion | id_telefono | fecha_nacimiento | sexo |
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
+	|        19 | 17844567Z | Pedro         | García    | Rubio     | 10           |           9 | 2000-07-15       | H    |
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
+	```
+	---
+
+	```sql
+    DELIMITER $$
+    DROP PROCEDURE IF EXISTS ActualizarAlumno;
+    CREATE PROCEDURE ActualizarAlumno (
+        IN p_id_alumno INT,
+        IN p_nif VARCHAR(9),
+        IN p_nombre_alumno VARCHAR(25),
+        IN p_apellido1 VARCHAR(50),
+        IN p_apellido2 VARCHAR(50),
+        IN p_id_direccion VARCHAR(5),
+        IN p_id_telefono INT,
+        IN p_fecha_nacimiento DATE,
+        IN p_sexo ENUM('H','M')
+    )
+    BEGIN
+        UPDATE alumno
+        SET nif = p_nif, nombre_alumno = p_nombre_alumno, apellido1 = p_apellido1, apellido2 = p_apellido2, 
+            id_direccion = p_id_direccion, id_telefono = p_id_telefono, fecha_nacimiento = p_fecha_nacimiento, sexo = p_sexo
+        WHERE id_alumno = p_id_alumno;
+    
+        SELECT * 
+        FROM alumno
+        WHERE nif = p_nif;
+    END $$
+    DELIMITER ; $$
+
+    CALL ActualizarAlumno (19, '17844567Z', 'Pablo', 'Lopez', 'Rubio', 11, 9, '2000-02-15', 'H');
+
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
+	| id_alumno | nif       | nombre_alumno | apellido1 | apellido2 | id_direccion | id_telefono | fecha_nacimiento | sexo |
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
+	|        19 | 17844567Z | Pablo         | Lopez     | Rubio     | 11           |           9 | 2000-02-15       | H    |
+	+-----------+-----------+---------------+-----------+-----------+--------------+-------------+------------------+------+
+	```
+	---
+
+	```sql
+    
+	```
+	---
+
+	```sql
+    
+	```
+	---
+
+	```sql
+    
+	```
+	---
+
+	```sql
+    
+	```
+	---
+
+	```sql
+    
+	```
+	---
+
+	```sql
+    
+	```
+
+	```sql
+    
+	```
+	---
+
+	```sql
+    
 	```
 	---
